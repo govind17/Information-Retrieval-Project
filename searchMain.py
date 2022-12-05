@@ -4,13 +4,22 @@ from flask import jsonify, request
 from flask import json
 from flask_cors import CORS
 import pandas as pd
+from rank_bm25 import BM25Okapi, BM25Plus
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 CORS(app)
 
 
-def bm25okapi_search(tokenized_query, bm25, corpus, n_results=1):
+# @app.before_first_request
+# def _declareStuff():
+#     global corpus
+#     corpus_df = pd.read_csv(
+#         '/Users/GovindShukla/tensorflow-env/trec_docs.csv')
+#     corpus = corpus_df['text'].values
+
+
+def bm25okapi_search(tokenized_query, corpus, n_results=1):
     """
     Function that takes a tokenized query and prints the first 100 words of the
     n_results most relevant results found in the corpus, based on the BM25
@@ -32,20 +41,44 @@ def bm25okapi_search(tokenized_query, bm25, corpus, n_results=1):
 
     # We skip checking validity of arguments for now... We assume the user
     # knows what they're doing.
+    # Tokenize the corpus
+    tokenized_corpus = [doc.split(" ") for doc in corpus]
+    # Instantiate BM25 object from the tokenized corpus
+    print('Still tokenizing...')
+    bm25 = BM25Plus(tokenized_corpus)
 
-    # Get top results for the query
-    return bm25.get_top_n(tokenized_query, corpus, n=n_results)
+    print('Still ranking...')
+
+    ranked = bm25.get_top_n(tokenized_query, corpus, n=n_results)
+    print('Ranking done...')
+    return ranked
 
 
-@app.route('/heroes', methods=['GET'])
-def heroes():
-    corpus_df = pd.read_csv('/Users/GovindShukla/Desktop/Information-Retrieval-Project/RankedDocuments/trec_docs_sample.csv')
-    corpus = corpus_df['text'].values
+@app.route('/query', methods=['GET'])
+def search():
+    # corpus_df = pd.read_csv(
+    #     '/Users/GovindShukla/Desktop/Information-Retrieval-Project/RankedDocuments/trec_docs_sample.csv')
+    # corpus = corpus_df['text'].values
     query = request.args.get('searchString')
-    tokenized_query = query.split(" ")
-    searchResults = bm25okapi_search(tokenized_query, corpus, 10)
-    print(searchResults)
-    return jsonify(searchResults)
+    print(query)
+    searchResults = pd.read_csv('/Users/GovindShukla/Desktop/Information-Retrieval-Project/RankedDocuments/RankingPrediction.csv')
+    print()
+    return searchResults.to_json(orient='records')
 
-app.run()
+@app.route('/feedback', methods=['POST'])
+def fetchFeedback():
+    # corpus_df = pd.read_csv(
+    #     '/Users/GovindShukla/Desktop/Information-Retrieval-Project/RankedDocuments/trec_docs_sample.csv')
+    # corpus = corpus_df['text'].values
+    list = request.args.get('feedbackList')
+    print(request.body)
+    print(list)
+    return
 
+
+# if __name__ == "__main__":
+#     corpus_df = pd.read_csv(
+#         '/Users/GovindShukla/Desktop/Information-Retrieval-Project/RankedDocuments/trec_docs_sample.csv')
+#     corpus = corpus_df['text'].values
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
