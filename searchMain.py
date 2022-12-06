@@ -61,19 +61,22 @@ def search():
     # corpus = corpus_df['text'].values
     query = request.args.get('searchString')
     print(query)
-    searchResults = pd.read_csv('/Users/GovindShukla/Desktop/Information-Retrieval-Project/RankedDocuments/RankingPrediction.csv')
+    searchResults = pd.read_csv(
+        'C:/Users/Pritha/Desktop/SUBJECTS/PROJECT/Relevance feedback with XAI/RankingPrediction.csv')
     print()
     return searchResults.to_json(orient='records')
 
+
 @app.route('/feedback', methods=['POST'])
 def fetchFeedback():
-    # corpus_df = pd.read_csv(
-    #     '/Users/GovindShukla/Desktop/Information-Retrieval-Project/RankedDocuments/trec_docs_sample.csv')
-    # corpus = corpus_df['text'].values
-    list = request.args.get('feedbackList')
-    print(request.body)
-    print(list)
-    return
+    feedbackJson = request.json['updates']
+    relevanceList = []
+    if len(feedbackJson):
+        for doc in feedbackJson:
+            for relevance in doc['value']:
+                relevanceList.append(relevance)
+    print(relevanceList)
+    return relevanceList
 
 
 # if __name__ == "__main__":
