@@ -13,26 +13,27 @@ def key_phrasification():
     # initialize a TopicRank keyphrase extraction model
     extractor = pke.unsupervised.TopicRank()
     #rankedDocument_df = pandas.read_csv('RankedDocuments/RankingPrediction.csv')
-    trec_docs_df = pandas.read_csv('RankedDocuments/cord19_sum.csv')
+    cord19_df = pandas.read_csv('RankedDocuments/cord19_sum.csv')
 
     # keys = list(rankedDocument_df.columns.values)
     # i1 = trec_docs_df.set_index(keys).index
     # i2 = rankedDocument_df.set_index(keys).index
     # filtered_docs_df = trec_docs_df[i1.isin(i2)]
-    df = pd.DataFrame(columns=['docno', 'abstract', 'summary','KeyList'])
+    df = pd.DataFrame(columns=['docno', 'title', 'abstract', 'summary','KeyList'])
     p = 0
-    for index, row in trec_docs_df.iterrows():
-        df.loc[p, 'doc_id'] = row['doc_id']
-        df.loc[p, 'text'] = row['text']
+    for index, row in cord19_df.iterrows():
+        df.loc[p, 'docno'] = row['docno']
+        df.loc[p, 'title'] = row['title']
+        df.loc[p, 'abstract'] = row['abstract']
         df.loc[p, 'summary'] = row['summary']
-        df.loc[p, 'KeyList'] = getKeys(extractor, row['text'])
+        df.loc[p, 'KeyList'] = getKeys(extractor, str(row['title']) + '\n' + str(row['abstract']))
         p = p + 1
     # applying merge
     # filtered_docs_df = pd.merge(filtered_docs_df, df, on = "doc_id", how = "inner")
-    df.to_csv('RankedDocuments/RankingPrediction.csv',index=False)
-    csvFilePath = r'RankedDocuments/RankingPrediction.csv'
-    jsonFilePath = r'RankedDocuments/keyPhrase.json'
-    csv_to_json(csvFilePath, jsonFilePath)
+    df.to_csv('RankedDocuments/cord19_sum_key.csv',index=False)
+    # csvFilePath = r'RankedDocuments/RankingPrediction.csv'
+    # jsonFilePath = r'RankedDocuments/keyPhrase.json'
+    # csv_to_json(csvFilePath, jsonFilePath)
 
 def csv_to_json(csvFilePath, jsonFilePath):
     jsonArray = []

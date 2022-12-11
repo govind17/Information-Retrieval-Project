@@ -5,6 +5,8 @@ from flask import json
 from flask_cors import CORS
 import pandas as pd
 from rank_bm25 import BM25Okapi, BM25Plus
+if not pt.started():
+    pt.init()
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -61,22 +63,20 @@ def search():
     # corpus = corpus_df['text'].values
     query = request.args.get('searchString')
     print(query)
-    searchResults = pd.read_csv(
-        'C:/Users/Pritha/Desktop/SUBJECTS/PROJECT/Relevance feedback with XAI/RankingPrediction.csv')
+    searchResults = pd.read_csv('/Users/GovindShukla/Desktop/Information-Retrieval-Project/RankedDocuments/RankingPrediction.csv')
     print()
     return searchResults.to_json(orient='records')
 
 
 @app.route('/feedback', methods=['POST'])
 def fetchFeedback():
-    feedbackJson = request.json['updates']
-    relevanceList = []
-    if len(feedbackJson):
-        for doc in feedbackJson:
-            for relevance in doc['value']:
-                relevanceList.append(relevance)
-    print(relevanceList)
-    return relevanceList
+    # corpus_df = pd.read_csv(
+    #     '/Users/GovindShukla/Desktop/Information-Retrieval-Project/RankedDocuments/trec_docs_sample.csv')
+    # corpus = corpus_df['text'].values
+    list = request.args.get('feedbackList')
+    print(request.body)
+    print(list)
+    return
 
 
 # if __name__ == "__main__":
