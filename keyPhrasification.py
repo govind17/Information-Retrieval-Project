@@ -9,11 +9,11 @@ csv.field_size_limit(sys.maxsize)
 
 
 
-def key_phrasification():
+def key_phrasification(cord19_df):
     # initialize a TopicRank keyphrase extraction model
     extractor = pke.unsupervised.TopicRank()
     #rankedDocument_df = pandas.read_csv('RankedDocuments/RankingPrediction.csv')
-    cord19_df = pandas.read_csv('RankedDocuments/cord19_sum.csv')
+    #cord19_df = pandas.read_csv('RankedDocuments/cord19_sum.csv')
 
     # keys = list(rankedDocument_df.columns.values)
     # i1 = trec_docs_df.set_index(keys).index
@@ -30,10 +30,11 @@ def key_phrasification():
         p = p + 1
     # applying merge
     # filtered_docs_df = pd.merge(filtered_docs_df, df, on = "doc_id", how = "inner")
-    df.to_csv('RankedDocuments/cord19_sum_key.csv',index=False)
+    # df.to_csv('RankedDocuments/cord19_sum_key.csv',index=False)
     # csvFilePath = r'RankedDocuments/RankingPrediction.csv'
     # jsonFilePath = r'RankedDocuments/keyPhrase.json'
     # csv_to_json(csvFilePath, jsonFilePath)
+    return df
 
 def csv_to_json(csvFilePath, jsonFilePath):
     jsonArray = []
