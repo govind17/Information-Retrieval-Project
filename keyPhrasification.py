@@ -5,28 +5,31 @@ import csv
 import json
 import sys
 
-csv.field_size_limit(sys.maxsize)
 
+# csv.field_size_limit(sys.maxsize)
 
 
 def key_phrasification(cord19_df):
     # initialize a TopicRank keyphrase extraction model
     extractor = pke.unsupervised.TopicRank()
-    #rankedDocument_df = pandas.read_csv('RankedDocuments/RankingPrediction.csv')
-    #cord19_df = pandas.read_csv('RankedDocuments/cord19_sum.csv')
+    # rankedDocument_df = pandas.read_csv('RankedDocuments/RankingPrediction.csv')
+    # cord19_df = pandas.read_csv('RankedDocuments/cord19_sum.csv')
 
     # keys = list(rankedDocument_df.columns.values)
     # i1 = trec_docs_df.set_index(keys).index
     # i2 = rankedDocument_df.set_index(keys).index
     # filtered_docs_df = trec_docs_df[i1.isin(i2)]
-    df = pd.DataFrame(columns=['docno', 'title', 'abstract', 'summary','KeyList'])
+    # print(cord19_df.columns)
+
+    df = pd.DataFrame(columns=['docno', 'title', 'abstract', 'summary', 'KeyList'])
+    # print(df.columns)
     p = 0
     for index, row in cord19_df.iterrows():
         df.loc[p, 'docno'] = row['docno']
         df.loc[p, 'title'] = row['title']
-        df.loc[p, 'abstract'] = row['abstract']
+        df.loc[p, 'abstract'] = row['abstract_x']
         df.loc[p, 'summary'] = row['summary']
-        df.loc[p, 'KeyList'] = getKeys(extractor, str(row['title']) + '\n' + str(row['abstract']))
+        df.loc[p, 'KeyList'] = getKeys(extractor, str(row['title']) + '\n' + str(row['abstract_x']))
         p = p + 1
     # applying merge
     # filtered_docs_df = pd.merge(filtered_docs_df, df, on = "doc_id", how = "inner")
@@ -36,23 +39,24 @@ def key_phrasification(cord19_df):
     # csv_to_json(csvFilePath, jsonFilePath)
     return df
 
+
 def csv_to_json(csvFilePath, jsonFilePath):
     jsonArray = []
-    #read csv file
+    # read csv file
     with open(csvFilePath, encoding='utf-8') as csvf:
-        #load csv file data using csv library's dictionary reader
+        # load csv file data using csv library's dictionary reader
         csvReader = csv.DictReader(csvf)
 
-        #convert each csv row into python dict
+        # convert each csv row into python dict
         for row in csvReader:
-            #add this python dict to json array
+            # add this python dict to json array
             jsonArray.append(row)
-
 
     # convert python jsonArray to JSON String and write to file
     with open(jsonFilePath, 'w', encoding='utf-8') as jsonf:
         jsonString = json.dumps(jsonArray, indent=4)
         jsonf.write(jsonString)
+
 
 def getKeys(extractor, text):
     extractor.load_document(input=text, language='en')
@@ -81,4 +85,3 @@ def getKeys(extractor, text):
 
 if __name__ == '__main__':
     key_phrasification()
-

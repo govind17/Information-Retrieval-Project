@@ -3,8 +3,9 @@ import import_ipynb
 import pandas as pd
 from flask import request
 from flask_cors import CORS
-from rank_bm25 import BM25Plus
+# from rank_bm25 import BM25Plus
 from keyPhrasification import key_phrasification
+from search.ipynb import search
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
